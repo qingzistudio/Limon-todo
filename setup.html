@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reminder Gen Setup</title>
+    <link rel="icon" href="icons/icon32.png" />
+    <link rel="stylesheet" href="setup.css" />
+  </head>
+  <body>
+    <main class="setup-shell">
+      <section class="hero">
+        <p class="eyebrow">Microsoft To Do Authorization</p>
+        <h1>Connect Reminder Gen</h1>
+        <p class="lede">
+          Microsoft requires every app that asks for To Do access to be registered first.
+          This page keeps that one-time setup out of the task popup.
+          Do not buy Entra ID P1/P2 for this prototype.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>1. Register The App</h2>
+            <p>Create a Microsoft Entra app registration and paste its client ID below.</p>
+          </div>
+          <a class="button ghost" href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noreferrer">
+            Open Entra
+          </a>
+        </div>
+
+        <ol class="steps">
+          <li>If Microsoft shows Entra ID P1/P2 pricing, back out. Those paid plans are not required for this extension.</li>
+          <li>Go to <strong>Identity</strong> / <strong>Applications</strong> / <strong>App registrations</strong>.</li>
+          <li>Click <strong>New registration</strong>.</li>
+          <li>For personal To Do accounts, choose <strong>Accounts in any organizational directory and personal Microsoft accounts</strong>.</li>
+          <li>After registering, copy <strong>Application (client) ID</strong> from the app Overview page.</li>
+          <li>Add the Redirect URI below under <strong>Authentication</strong> as a <strong>Single-page application</strong> redirect URI. Do not add it as Web.</li>
+          <li>Add delegated Microsoft Graph permissions: <strong>User.Read</strong> and <strong>Tasks.ReadWrite</strong>.</li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>2. Local Settings</h2>
+            <p id="save-status">Settings are stored locally in this Chrome profile.</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>Redirect URI</span>
+          <div class="copy-row">
+            <input id="redirect-uri" type="text" readonly />
+            <button id="copy-redirect" class="ghost">Copy</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span>Application Client ID</span>
+          <input id="client-id" type="text" spellcheck="false" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+        </label>
+
+        <div class="grid">
+          <label class="field">
+            <span>Target List</span>
+            <input id="list-name" type="text" value="Reminder Gen Inbox" />
+          </label>
+
+          <label class="field">
+            <span>Tenant</span>
+            <input id="tenant" type="text" spellcheck="false" value="consumers" />
+          </label>
+        </div>
+
+        <div class="preset-row" aria-label="Tenant presets">
+          <button class="ghost" data-tenant-preset="consumers">Personal Account</button>
+          <button class="ghost" data-tenant-preset="organizations">Work / School</button>
+        </div>
+
+        <p class="hint">
+          Use <code>consumers</code> for a personal Outlook/Hotmail Microsoft To Do account.
+          Use <code>organizations</code> or your Directory tenant ID for a work or school account.
+          Do not use <code>common</code> with a consumer-only app registration; Microsoft rejects that combination.
+          A tenant ID is on the Microsoft Entra Overview page as <strong>Directory (tenant) ID</strong>.
+          The paid Entra plans are for enterprise identity features, not for this local OAuth client.
+        </p>
+
+        <div class="actions">
+          <button id="save-settings" class="ghost">Save Settings</button>
+          <button id="connect-microsoft" class="primary">Save & Sign In</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>3. Account</h2>
+            <p id="auth-status">Not connected.</p>
+          </div>
+          <button id="disconnect-microsoft" class="ghost" disabled>Sign Out</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="setup.js"></script>
+  </body>
+</html>

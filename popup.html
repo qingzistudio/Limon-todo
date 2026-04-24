@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reminder Gen</title>
+    <link rel="icon" href="icons/icon32.png" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Quick Tasks To Microsoft To Do</p>
+        <h1>Reminder Gen</h1>
+      </section>
+
+      <section class="panel setup-panel auth-strip">
+        <div class="auth-row">
+          <div>
+            <h2>Microsoft</h2>
+            <p id="auth-status">Not connected.</p>
+          </div>
+          <div class="compact-actions">
+            <button id="open-setup" class="ghost">Setup</button>
+            <button id="connect-microsoft" class="primary">Sign In</button>
+            <button id="disconnect-microsoft" class="ghost" disabled>Sign Out</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel quick-create-panel">
+        <div class="default-due">
+          <span>Due Date</span>
+          <div class="due-chips" aria-label="Default due date">
+            <button class="due-chip is-active" data-default-due="today">Today</button>
+            <button class="due-chip" data-default-due="tomorrow">Tomorrow</button>
+            <button class="due-chip" data-default-due="week">Week</button>
+            <button class="due-chip" data-default-due="month">Month</button>
+            <button class="due-chip" data-default-due="year">Year</button>
+          </div>
+        </div>
+
+        <div class="source-input-wrap">
+          <div class="source-guide" aria-hidden="true">
+            <div class="source-guide-line" data-guide-line="0">Content:</div>
+            <div class="source-guide-line" data-guide-line="1">Members:</div>
+            <div class="source-guide-line" data-guide-line="2">Location:</div>
+          </div>
+          <textarea id="source-text" rows="5" spellcheck="false"></textarea>
+        </div>
+
+        <label class="field custom-date-field">
+          <span>Specific Due Date</span>
+          <input id="custom-due-date" type="date" />
+        </label>
+
+        <div class="task-options">
+          <label class="field">
+            <span>Reminder Time</span>
+            <input id="reminder-time" type="time" value="18:00" />
+          </label>
+
+          <label class="priority-toggle">
+            <input id="priority-on" type="checkbox" />
+            <span>Priority</span>
+          </label>
+        </div>
+
+        <p id="summary" class="quick-summary">
+          Due today appears in My Day. Priority appears in Important. Other dated tasks appear in Planned.
+        </p>
+        <div class="actions">
+          <button id="push-tasks" class="primary" disabled>Push To Microsoft To Do</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
