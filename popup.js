@@ -1,6 +1,8 @@
 const SETTINGS_STORAGE_KEY = "settings";
 const DEFAULT_LIST_NAME = "Reminder Gen Inbox";
 const DEFAULT_REMINDER_TIME = "18:00";
+const RELATIVE_DUE_MODES = ["today", "tomorrow", "week", "month", "year"];
+const CUSTOM_DUE_MODE = "custom";
 
 const elements = {
   authStatus: document.querySelector("#auth-status"),
@@ -45,8 +47,10 @@ async function init() {
     updateActionAvailability();
   });
   bindOptional(elements.customDueDate, "change", () => {
-    state.settings.customDueDate = normalizeDateInput(elements.customDueDate.value) || todayDateString();
+    state.settings.defaultDueMode = CUSTOM_DUE_MODE;
+    state.settings.customDueDate = normalizeDateInput(elements.customDueDate.value) || dueDateFromMode("today");
     state.pushed = false;
+    renderSettings();
     void saveSettings();
     updateActionAvailability();
   });
@@ -67,7 +71,7 @@ async function init() {
   elements.defaultDueButtons.forEach((button) => {
     bindOptional(button, "click", () => {
       state.settings.defaultDueMode = normalizeDefaultDueMode(button.dataset.defaultDue);
-      state.settings.customDueDate = dueDateFromMode(state.settings.defaultDueMode);
+      state.settings.customDueDate = "";
       state.pushed = false;
       renderSettings();
       void saveSettings();
@@ -115,12 +119,13 @@ async function loadSettings() {
 
 function normalizeSettings(settings) {
   const mode = normalizeDefaultDueMode(settings.defaultDueMode);
+  const customDueDate = normalizeDateInput(settings.customDueDate);
   return {
     ...settings,
     tenant: normalizeTenant(settings.tenant),
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
     defaultDueMode: mode,
-    customDueDate: normalizeDateInput(settings.customDueDate) || dueDateFromMode(mode),
+    customDueDate: mode === CUSTOM_DUE_MODE ? customDueDate || dueDateFromMode("today") : "",
     reminderTime: normalizeTimeInput(settings.reminderTime),
     priorityOn: Boolean(settings.priorityOn)
   };
@@ -131,7 +136,7 @@ async function saveSettings() {
 }
 
 function renderSettings() {
-  elements.customDueDate.value = state.settings.customDueDate;
+  elements.customDueDate.value = selectedDueDate();
   elements.reminderTime.value = state.settings.reminderTime;
   elements.priorityOn.checked = Boolean(state.settings.priorityOn);
   updateDefaultDueButtons();
@@ -143,7 +148,7 @@ function normalizeTenant(value) {
 }
 
 function normalizeDefaultDueMode(value) {
-  return ["today", "tomorrow", "week", "month", "year"].includes(value) ? value : "today";
+  return [...RELATIVE_DUE_MODES, CUSTOM_DUE_MODE].includes(value) ? value : "today";
 }
 
 function normalizeDateInput(value) {
@@ -199,7 +204,7 @@ function updateSourceGuide() {
 }
 
 function buildTasksFromSource() {
-  const dueDate = state.settings.customDueDate || dueDateFromMode(state.settings.defaultDueMode);
+  const dueDate = selectedDueDate();
   const reminderTime = normalizeTimeInput(state.settings.reminderTime);
   const importance = state.settings.priorityOn ? "high" : "normal";
   return splitTaskLines(elements.sourceText.value).map((line) => ({
@@ -287,8 +292,11 @@ function dueDateFromMode(mode) {
   }
 }
 
-function todayDateString() {
-  return formatDateOnly(startOfToday());
+function selectedDueDate(settings = state.settings) {
+  if (settings.defaultDueMode === CUSTOM_DUE_MODE) {
+    return normalizeDateInput(settings.customDueDate) || dueDateFromMode("today");
+  }
+  return dueDateFromMode(settings.defaultDueMode);
 }
 
 function startOfToday() {
